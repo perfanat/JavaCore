@@ -1,38 +1,35 @@
 package lesson2;
 
 class MyArraySizeException extends Exception {
-    String name;
-    public MyArraySizeException(String name) {
-        this.name=name;
+    MyArraySizeException() {
     }
 }
 
-
 class MyArrayDataException extends Exception {
-    String name;
     static int x;
     static int y;
-    public MyArrayDataException() {
-        name="Ошибка - неверный символ в ячейке";
-    }
+    MyArrayDataException() {}
 
-    public static void infoEx(){
+    static void infoEx(){
         System.out.println(String.format("\nОшибка - неверный символ в ячейке %s/%s",x,y));
     }
 }
 
 public class MyException {
 
-    public static void myMethod(String [][] str) throws MyArraySizeException, MyArrayDataException {
+    private static void myMethod(String[][] str) throws MyArraySizeException, MyArrayDataException {
 
         boolean noCorrectSize = false;
         if (str.length!=4)noCorrectSize=true;
-        for (int i = 0; i < str.length; i++) {
-            noCorrectSize|=str[i].length!=4;
+        for (String[] strings : str) {
+            if (strings.length != 4) {
+                noCorrectSize = true;
+                break;
+            }
         }
 
         if (noCorrectSize){
-            throw new MyArraySizeException("Неверный размер");
+            throw new MyArraySizeException();
         } else {
             System.out.println("Программа инициализации массива отработала корректно");
         }
@@ -59,9 +56,9 @@ public class MyException {
         String [][] str1 = {{"1","1","1","1",}, {"1","2","3","4",}, {"5","j","7","8",}, {"2","2","2","2"}};
 
         //просмотр массива
-        for (int i = 0; i < str1.length; i++) {
-            for (int j = 0; j < str1[i].length; j++) {
-                System.out.print(str1[i][j]+" ");
+        for (String[] strings : str1) {
+            for (String string : strings) {
+                System.out.print(string + " ");
             }
             System.out.println();
         }
