@@ -7,7 +7,6 @@ class MyArraySizeException extends Exception {
     }
 }
 
-
 class MyArrayDataException extends Exception {
     String name;
     static int x;
