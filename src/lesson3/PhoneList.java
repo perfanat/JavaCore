@@ -2,31 +2,34 @@ package lesson3;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class PhoneList {
-    private static HashMap<String,String>phLis=new HashMap<>(Map.of(
-            "123456", "Иванов",
-            "123455", "Петров",
-            "123454", "Сидоров",
-            "123453", "Иванов"));
+    private static Map<String, Set<String>>phLis=new HashMap<>();
 
     public static void main(String[] args) {
+        phLis.get("Иванов").add("123456");
+        phLis.get("Петров").add("123455");
+        phLis.get("Сидоров").add("123454");
+        phLis.get("Иванов").add("123453");
         printList(phLis);
         System.out.println("--------");
-        phLis.put ("123452", "Петров");
+        phLis.get("Петров").add("123452");
         printList(phLis);
         System.out.println("--------");
         findPhone("Иванов");
     }
 
-    private static void printList(HashMap<String, String> hashMap){
-        for(Map.Entry<String, String> e: hashMap.entrySet()) {
-            System.out.println(e.getValue()+": "+e.getKey());
+    private static void printList(Map<String, Set<String>> hashMap){
+        for (Map.Entry<String, Set<String>> e : hashMap.entrySet()) {
+            for(String s : e.getValue()) {
+                System.out.println(e.getKey()+" - "+s);
+            }
         }
     }
 
     private static void findPhone(String str){
-        for(Map.Entry<String, String> e: phLis.entrySet()) {
+        for(Map.Entry<String, Set<String>> e: phLis.entrySet()) {
             if (e.getValue().equals(str))
             System.out.println(e.getValue()+": "+e.getKey());
         }
