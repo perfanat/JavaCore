@@ -53,7 +53,7 @@ public class Collection {
         for (String s : arr) {
             resList.putIfAbsent(s, 0);
             int count = resList.get(s);
-            resList.put(s, count+1);
+            resList.put(s, ++count);
         }
     }
 }

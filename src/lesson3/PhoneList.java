@@ -6,23 +6,30 @@ import java.util.Map;
 import java.util.Set;
 
 public class PhoneList {
+
     private static Map<String, Set<String>>phLis=new HashMap<>();
 
     public static void main(String[] args) {
-        phLis.put("Иванов", new HashSet<>());
-        phLis.put("Петров", new HashSet<>());
-        phLis.put("Сидоров", new HashSet<>());
-        phLis.get("Иванов").add("123456");
-        phLis.get("Петров").add("123455");
-        phLis.get("Сидоров").add("123454");
-        phLis.get("Иванов").add("123453");
+        addPhone ("Иванов", "123456");
+        addPhone ("Петров", "123455");
+        addPhone ("Сидоров", "123454");
+        addPhone ("Иванов", "123453");
+        addPhone ("Петров", "123452");
         printList(phLis);
         System.out.println("--------");
-        phLis.get("Петров").add("123452");
-        printList(phLis);
-        System.out.println("--------");
-        findPhone("Петров");
-        System.out.println("---------\n"+phLis.get("Петров"));
+        System.out.println("Иванов - "+getPhone("Иванов"));
+    }
+
+    private static void addPhone(String name, String phone) {
+        if (!phLis.containsKey(name)){
+            phLis.put(name, new HashSet<>());
+            }
+        phLis.get(name).add(phone);
+
+    }
+
+    private static Set<String> getPhone(String name) {
+        return phLis.get(name);
     }
 
     private static void printList(Map<String, Set<String>> hashMap){
@@ -30,15 +37,6 @@ public class PhoneList {
             for(String s : e.getValue()) {
                 System.out.println(e.getKey()+" - "+s);
             }
-        }
-    }
-
-    private static void findPhone(String str){
-        for(Map.Entry<String, Set<String>> e: phLis.entrySet()) {
-            if (e.getKey().equals(str))
-                for(String s : e.getValue()) {
-                    System.out.println(e.getKey()+" - "+s);
-                }
         }
     }
 }
