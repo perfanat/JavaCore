@@ -38,15 +38,22 @@ public class Collection {
     }
 
     // метод создания списка уникальных слов
+//    private static void checkArr(ArrayList<String> arr){
+//        for (String s : arr) {
+//            int count = 0;
+//            for (String c:arr) {
+//                if (c.equals(s)){
+//                    count++;
+//                }
+//            }
+//            resList.put(s, count);
+//        }
+//    }
     private static void checkArr(ArrayList<String> arr){
         for (String s : arr) {
-            int count = 0;
-            for (String c:arr) {
-                if (c.equals(s)){
-                    count++;
-                }
-            }
-            resList.put(s, count);
+            resList.putIfAbsent(s, 0);
+            int count = resList.get(s);
+            resList.put(s, count+1);
         }
     }
 }
