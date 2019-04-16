@@ -22,6 +22,7 @@ public class PhoneList {
         printList(phLis);
         System.out.println("--------");
         findPhone("Петров");
+        System.out.println("---------\n"+phLis.get("Петров"));
     }
 
     private static void printList(Map<String, Set<String>> hashMap){
