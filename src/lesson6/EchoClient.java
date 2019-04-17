@@ -10,8 +10,7 @@ public class EchoClient {
 
     public static void main(String[] args) {
 
-        try (Scanner scanner = new Scanner(System.in);
-             Socket socket = new Socket("localhost", 7777)) {
+        try (Socket socket = new Socket("localhost", 7777)) {
 
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -36,6 +35,7 @@ public class EchoClient {
             Thread t1 = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Scanner scanner = new Scanner(System.in);
                     while (scanner.hasNextLine())
                         try {
                             System.out.print("Введите сообщение > ");

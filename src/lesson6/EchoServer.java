@@ -11,7 +11,6 @@ public class EchoServer {
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(7777)) {
-            Scanner scanner = new Scanner(System.in);
             System.out.println("Сервер ожидает подключения!");
             Socket socket = serverSocket.accept();
             System.out.println("Кто-то подключился: " + socket.getInetAddress());
@@ -24,6 +23,7 @@ public class EchoServer {
             Thread t1 = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Scanner scanner = new Scanner(System.in);
                     while (scanner.hasNextLine())
                     try {
                         System.out.print("Введите сообщение > ");
