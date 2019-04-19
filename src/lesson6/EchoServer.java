@@ -10,7 +10,11 @@ import java.util.Scanner;
 public class EchoServer {
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(7777)) {
+        try
+                //(ServerSocket serverSocket = new ServerSocket(7777))
+        {
+            ServerSocket serverSocket = new ServerSocket(7777);
+
             System.out.println("Сервер ожидает подключения!");
             Socket socket = serverSocket.accept();
             System.out.println("Кто-то подключился: " + socket.getInetAddress());
@@ -48,7 +52,7 @@ public class EchoServer {
                 public void run() {
                     while (true) {
                         try {
-                            System.out.println("Новое сообщение > " + in.readUTF());
+                            System.out.println("\nНовое сообщение > " + in.readUTF()+"\nВведите сообщение > ");
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             break;
