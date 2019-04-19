@@ -10,7 +10,10 @@ public class EchoClient {
 
     public static void main(String[] args) {
 
-        try (Socket socket = new Socket("localhost", 7777)) {
+        try
+                //(Socket socket = new Socket("localhost", 7777))
+        {
+            Socket socket = new Socket("localhost", 7777);
 
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -60,7 +63,7 @@ public class EchoClient {
                 public void run() {
                     while (true) {
                         try {
-                            System.out.println("Новое сообщение > " + in.readUTF());
+                            System.out.println("\nНовое сообщение > " + in.readUTF()+"\nВведите сообщение > ");
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             break;
