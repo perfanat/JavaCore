@@ -63,7 +63,7 @@ public class EchoClient {
                 public void run() {
                     while (true) {
                         try {
-                            System.out.println("\nНовое сообщение > " + in.readUTF()+"\nВведите сообщение > ");
+                            System.out.print("\nНовое сообщение > " + in.readUTF()+"\nВведите сообщение > ");
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             break;
