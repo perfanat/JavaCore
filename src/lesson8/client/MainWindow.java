@@ -1,25 +1,26 @@
 package lesson8.client;
 
+import lesson8.client.TextMessageCellRenderer;
+import lesson8.server.ChatServer;
+
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
 
-// основное окно с интерфейсом MessageReciever (отправка сообщений)
 public class MainWindow extends JFrame implements MessageReciever {
 
-    // список для отображения данных
     private final JList<TextMessage> messageList;
 
-    // модель списка для заполнения
     private final DefaultListModel<TextMessage> messageListModel;
 
-    // класс отображения элементов списка
     private final TextMessageCellRenderer messageCellRenderer;
 
-    // покрутка
     private final JScrollPane scroll;
 
     private final JPanel sendMessagePanel;
@@ -27,14 +28,18 @@ public class MainWindow extends JFrame implements MessageReciever {
     private final JButton sendButton;
 
     private final JTextField messageField;
-    private final JTextField messageFieldToUser;
+
+    private final JTextField userField;
+
+    private final JList<String> userList;
+
+    private final DefaultListModel<String> userListModel;
 
     private final Network network;
 
-
     public MainWindow() {
-        setTitle("Application");
-        setBounds(200,200, 500, 500);
+        setTitle("Сетевой чат.");
+        setBounds(200,200, 350, 500);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         setLayout(new BorderLayout());
@@ -52,76 +57,70 @@ public class MainWindow extends JFrame implements MessageReciever {
 
         sendMessagePanel = new JPanel();
         sendMessagePanel.setLayout(new BorderLayout());
+
         sendButton = new JButton("Отправить");
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // получаем текст ввода
                 String text = messageField.getText();
+                // TODO отправлять сообщение пользователю выбранному в списке userList
+                //userField.setText(userList.getSelectedValue());
 
-                String userTo = null;
-                boolean isUserTo = false;
-
-                // если поле ввода адресата пустое
-                if (messageFieldToUser.getText().equals("")){
-                    ArrayList<String> authParts = new  ArrayList<String>(Arrays.asList(text.split(" ")));
-                    if (authParts.get(0).equals("/w")) {
-                        userTo=authParts.get(1);
-                        isUserTo=true;
-                        authParts.remove(1);
-                        authParts.remove(0);
-                        String msg="";
-                        for (int i=0; i<authParts.size();i++){
-                            msg+=authParts.get(i)+" ";
-                        }
-                        text=msg;
-                    }
-                } else {
-                    userTo=messageFieldToUser.getText();
-                    isUserTo=true;
-                }
-
-                // если ничего не написано или без пробелов оно пустое
-                if (text != null && !text.trim().isEmpty()&&isUserTo) {
+                String userTo = userField.getText();
+                if (text != null && !text.trim().isEmpty()) {
                     TextMessage msg = new TextMessage(network.getLogin(), userTo, text);
                     messageListModel.add(messageListModel.size(), msg);
                     messageField.setText(null);
-
-                    // TODO реализовать проверку, что сообщение не пустое
                     network.sendTextMessage(msg);
-                } else {
-                    if (!isUserTo){
-                        JOptionPane.showMessageDialog(MainWindow.this,
-                                "Не выбран пользователь",
-                                "Отправка сообщения",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
                 }
             }
         });
         sendMessagePanel.add(sendButton, BorderLayout.EAST);
         messageField = new JTextField();
-        messageFieldToUser = new JTextField(8);
-
-        sendMessagePanel.add(messageFieldToUser, BorderLayout.WEST);
         sendMessagePanel.add(messageField, BorderLayout.CENTER);
+        userField = new JTextField("", 7);
+        sendMessagePanel.add(userField, BorderLayout.WEST);
 
         add(sendMessagePanel, BorderLayout.SOUTH);
-        setVisible(true);
 
         this.network = new Network("localhost", 7777, this);
+
+        //userList = new JList<>();
+        //userList=network.clientlist;
+        userListModel = new DefaultListModel<>();
+        userList = network.clientlist;
+        userList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                userField.setText(userList.getSelectedValue());
+            }
+        });
+        userList.setModel(userListModel);
+        userList.setPreferredSize(new Dimension(100, 0));
+        add(userList, BorderLayout.WEST);
+
+        setVisible(true);
 
         LoginDialog loginDialog = new LoginDialog(this, network);
         loginDialog.setVisible(true);
 
-        // если мы не авторизовываемся то выходим
         if (!loginDialog.isConnected()) {
             System.exit(0);
         }
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (network != null) {
+                    network.close();
+                }
+                super.windowClosing(e);
+            }
+        });
+
+        setTitle("Сетевой чат. Пользователь " + network.getLogin());
     }
 
-    // реализация интерфейса
     @Override
     public void submitMessage(TextMessage message) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -129,6 +128,32 @@ public class MainWindow extends JFrame implements MessageReciever {
             public void run() {
                 messageListModel.add(messageListModel.size(), message);
                 messageList.ensureIndexIsVisible(messageListModel.size() - 1);
+            }
+        });
+    }
+
+    @Override
+    public void userConnected(String login) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int ix = userListModel.indexOf(login);
+                if (ix == -1) {
+                    userListModel.add(userListModel.size(), login);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void userDisconnected(String login) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int ix = userListModel.indexOf(login);
+                if (ix >= 0) {
+                    userListModel.remove(ix);
+                }
             }
         });
     }

@@ -1,15 +1,14 @@
 package lesson8.server;
 
+import lesson8.client.TextMessage;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import static lesson7.client.MessagePatterns.MESSAGE_SEND_PATTERN;
+import static lesson8.client.MessagePatterns.*;
 
-// класс, отвечающий за обмен сообщениями между клиентами и сервером
 public class ClientHandler {
 
     private final String login;
@@ -29,27 +28,24 @@ public class ClientHandler {
         this.handleThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                // пока поток не прерван
                 while (!Thread.currentThread().isInterrupted()) {
                     try {
-                        // получаем сообщение
-                        String msg = inp.readUTF();
-                        // печатаем сообщение
-                        System.out.printf("Message from user %s: %s%n", login, msg);
-
-                        // TODO проверить является ли msg сообщением для пользователя
-
-                        ArrayList<String> authParts = new  ArrayList<String>(Arrays.asList(msg.split(" ")));
-                        if (authParts.get(0).equals("/w")) {
-
-
-                        // TODO если да, то переслать это сообщение пользователю
-                        String userTo = authParts.get(1);
-                        authParts.remove(1);
-                        authParts.remove(0);
-                        String message = authParts.toString();
-                        //sendMessage(userTo, message);
-                        chatServer.sendMessage(userTo, login, message);}
+                        String text = inp.readUTF();
+                        System.out.printf("Message from user %s: %s%n", login, text);
+                        TextMessage msg = parseTextMessageRegx(text, login);
+                        if (msg != null) {
+                            //msg.swapUsers();
+                            chatServer.sendMessage(msg);
+                        } else if (text.equals(DISCONNECT)) {
+                            System.out.printf("User %s is disconnected%n", login);
+                            chatServer.unsubscribe(login);
+                            return;
+                        }
+                        String[] parts = text.split(" ", 3);
+                        if (parts[0].equals("/clientlist")){
+                            msg=new TextMessage("", parts[1], parts[2]);
+                            chatServer.sendMessage(msg);
+                        }
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -67,6 +63,14 @@ public class ClientHandler {
     }
 
     public void sendMessage(String userFrom, String msg) throws IOException {
-       out.writeUTF(String.format(MESSAGE_SEND_PATTERN, userFrom, msg));
+        if (socket.isConnected()) {
+            out.writeUTF(String.format(MESSAGE_SEND_PATTERN, login, msg));
+        }
+    }
+
+    public void sendConnectedMessage(String login) throws IOException {
+        if (socket.isConnected()) {
+            out.writeUTF(String.format(CONNECTED_SEND, login));
+        }
     }
 }

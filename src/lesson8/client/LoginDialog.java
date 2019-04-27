@@ -7,19 +7,24 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 // диалоговое окно авторизации клиента
 public class LoginDialog extends JDialog {
 
     private Network network;
-    private JTextField tfUsername;
-    private JPasswordField pfPassword;
+    //private JTextField tfUsername;
+    //private JPasswordField pfPassword;
+    private JTextField pfPassword;
     private JLabel lbUsername;
     private JLabel lbPassword;
     private JButton btnLogin;
     private JButton btnCancel;
-    private JComboBox<Object> jComboBox;
+    private JComboBox jComboBox;
 
     private boolean connected;
 
@@ -38,13 +43,29 @@ public class LoginDialog extends JDialog {
         cs.gridwidth = 1;
         panel.add(lbUsername, cs);
 
-        //tfUsername = new JTextField(20);
-        Object[] arrUser = AuthServiceImpl.users.keySet().toArray();
-        jComboBox = new JComboBox<>(arrUser);
+        String []arrUser = {"<html><font color = gray>выбор юзера</font>","Иван", "Петр", "Юля"};
+        Map<String,String>listOfUsers=new HashMap<>(Map.of("Иван", "1", "Петр", "2","Юля", "3"));
+        jComboBox = new JComboBox(arrUser);
+        jComboBox.setSize(5, 30);
+        jComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text=(String) jComboBox.getSelectedItem();
+                pfPassword.setText(listOfUsers.get(text));
+            }
+        });
+//        jComboBox.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent e) {
+//                super.mousePressed(e);
+//                String text=(String) jComboBox.getSelectedItem();
+//                pfPassword.setText(listOfUsers.get(text));
+//                //pass=listOfUsers.get(text);
+//            }
+//        });
         cs.gridx = 1;
         cs.gridy = 0;
         cs.gridwidth = 2;
-        //panel.add(tfUsername, cs);
         panel.add(jComboBox, cs);
 
         lbPassword = new JLabel("Пароль: ");
@@ -53,7 +74,8 @@ public class LoginDialog extends JDialog {
         cs.gridwidth = 1;
         panel.add(lbPassword, cs);
 
-        pfPassword = new JPasswordField(20);
+        //pfPassword = new JPasswordField(pass,10);
+        pfPassword = new JTextField(10);
         cs.gridx = 1;
         cs.gridy = 1;
         cs.gridwidth = 2;
@@ -72,7 +94,8 @@ public class LoginDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     // авторизация в Network
-                    network.authorize(tfUsername.getText(), String.valueOf(pfPassword.getPassword()));
+                    network.authorize((String) jComboBox.getSelectedItem(), String.valueOf(pfPassword.getText()));
+                    //network.authorize((String) jComboBox.getSelectedItem(), String.valueOf(pfPassword.getPassword()));
                     connected = true;
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(LoginDialog.this,

@@ -2,10 +2,9 @@ package lesson8.client;
 
 import java.time.LocalDateTime;
 
-// формат сообщения
 public class TextMessage {
 
-    private LocalDateTime created; // класс времени
+    private LocalDateTime created;
 
     private String userFrom;
 
@@ -14,7 +13,7 @@ public class TextMessage {
     private String text;
 
     public TextMessage(String userFrom, String userTo, String text) {
-        this.created = LocalDateTime.now(); // время
+        this.created = LocalDateTime.now();
         this.userFrom = userFrom;
         this.userTo = userTo;
         this.text = text;
@@ -42,5 +41,15 @@ public class TextMessage {
 
     public LocalDateTime getCreated() {
         return created;
+    }
+
+    /**
+     * Это не очень хорошее решение проблемы с использованием класса как на клиенте
+     * так и на сервере, но ничего лучше пока не придумал
+     */
+    public void swapUsers() {
+        String tmp = userFrom;
+        userFrom = userTo;
+        userTo = tmp;
     }
 }

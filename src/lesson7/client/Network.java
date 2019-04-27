@@ -42,16 +42,16 @@ public class Network {
                         if (text!=null)
                         // TODO определить текст и отправителя
                         {
-                            ArrayList<String> authParts = new ArrayList<String>(Arrays.asList(text.split(" ")));
-                            String userFrom = authParts.get(1);
+                            String[] authParts = text.split(" ", 3);
+                            String userFrom = authParts[1];
                             String userTo = login;
-                            authParts.remove(1);
-                            authParts.remove(0);
-                            String msg="";
-                            for (int i=0; i<authParts.size();i++){
-                                msg+=authParts.get(i)+" ";
-                            }
-                            TextMessage textMessage = new TextMessage(userFrom, userTo, msg);
+//                            authParts.remove(1);
+//                            authParts.remove(0);
+//                            String msg="";
+//                            for (int i=0; i<authParts.size();i++){
+//                                msg+=authParts.get(i)+" ";
+//                            }
+                            TextMessage textMessage = new TextMessage(userFrom, userTo, authParts[2]);
                             messageReciever.submitMessage(textMessage);
                         }
                     } catch (IOException e) {
