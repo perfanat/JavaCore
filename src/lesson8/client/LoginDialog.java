@@ -43,7 +43,7 @@ public class LoginDialog extends JDialog {
         cs.gridwidth = 1;
         panel.add(lbUsername, cs);
 
-        String []arrUser = {"<html><font color = gray>выбор юзера</font>","Иван", "Петр", "Юля"};
+        String []arrUser = {"<html><font color = gray><i>выбор юзера</i ></font>","Иван", "Петр", "Юля"};
         Map<String,String>listOfUsers=new HashMap<>(Map.of("Иван", "1", "Петр", "2","Юля", "3"));
         jComboBox = new JComboBox(arrUser);
         jComboBox.setSize(5, 30);

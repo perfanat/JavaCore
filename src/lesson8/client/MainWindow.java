@@ -83,7 +83,7 @@ public class MainWindow extends JFrame implements MessageReciever {
 
         add(sendMessagePanel, BorderLayout.SOUTH);
 
-        this.network = new Network("localhost", 7777, this);
+        this.network = new Network("localhost", 5555, this);
 
         //userList = new JList<>();
         //userList=network.clientlist;
