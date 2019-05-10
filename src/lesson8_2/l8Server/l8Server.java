@@ -3,8 +3,15 @@ package lesson8_2.l8Server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class l8Server {
+
+    private static Map<String, Socket> listOfSockets = Collections.synchronizedMap(new HashMap<>());
+
     public static void main(String[] args) throws IOException {
         int count = 0;
         ServerSocket serverSocket = new ServerSocket(8189); // создание сервера
@@ -21,27 +28,40 @@ public class l8Server {
 
             writer.writeUTF("Сервер: Вы клиент №"+count); // написание сообщение
 
-            Thread recievThread = new Thread(new Runnable() {
+            Thread receiveThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (!Thread.currentThread().isInterrupted()){
+                        String text = null;
                         try {
-                            System.out.println(reader.readUTF());
+                            text = reader.readUTF();
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Thread.currentThread().interrupt();
+                        }
+                        System.out.println(text);
+                        String[] parts = text.split(" ", 3);
+                        if (parts[0].equals("/auth")){
+                            l8User user = new l8User(parts[1], parts[2]);
+                            if (l8AuthService.authUser (user)){
+                                try {
+                                    writer.writeUTF("/auth successful");
+                                    listOfSockets.put(user.getLogin(), clientSocket);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    writer.writeUTF("/auth fail");
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 }
             });
-            recievThread.start();
-
-            System.out.println("Закрытие исходящего потока");
-            System.out.println("Закрытие чтения входящих");
-            writer.close(); // закрытие исходящего потока
-            reader.close(); // закрытие чтения входящих
-
-            System.out.println("Закрытие сокета");
-            clientSocket.close(); // закрытие сокета
+            receiveThread.start();
         }
     }
 }

@@ -2,12 +2,19 @@ package lesson8_2.l8Client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class l8ClientWindow extends JFrame {
+
+    public static JTextArea textArea;
+    public JTextField textField;
+    Socket clientSocket;
+
     public l8ClientWindow() throws IOException {
         setTitle("Сетевой чат.");
         setBounds(200,200, 350, 500);
@@ -26,9 +33,16 @@ public class l8ClientWindow extends JFrame {
         panel.add(button, BorderLayout.EAST);
         add(panel, BorderLayout.SOUTH);
 
-        // создаём сокет у клиента
-        Socket clientSocket = new Socket("127.0.0.1", 8189);
-        textArea.append("Вы подключились");
+        setVisible(true);
+
+        //Socket clientSocket = new Socket("127.0.0.1", 8189);
+
+        l8LoginDialog dialog = new l8LoginDialog(this);
+        dialog.setVisible(true);
+
+        clientSocket = l8LoginDialog.clentSocket;
+
+        textArea.append("Вы подключились\n");
         System.out.println("Вы подключились");
 
         // создание исходящего потока
@@ -36,37 +50,53 @@ public class l8ClientWindow extends JFrame {
         // создание потока чтения
         DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
 
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText();
+                try {
+                    writer.writeUTF("Клиент: "+text);
+                    textField.setText("");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText();
+                try {
+                    writer.writeUTF("Клиент: "+text);
+                    textField.setText("");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        String str = reader.readUTF();
+        textArea.append(str+"\n");
+
         writer.writeUTF("Клиент: дайте мне информацию"); // написание сообщение
         writer.flush(); // отправка
 
-        Thread recievThread = new Thread(new Runnable() {
+        Thread receiveThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (!Thread.currentThread().isInterrupted()){
+                    String str = null;
                     try {
-                        String str = reader.readUTF();
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                textArea.append(str);
-                            }
-                        });
+                        str = reader.readUTF();
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }
+                    if (!str.equals(null)){
+                        textArea.append(str+"\n");
                     }
                 }
             }
         });
-        recievThread.start();
-
-        writer.close(); // закрытие исходящего потока
-        reader.close(); // закрытие чтения входящих
-        System.out.println("Закрытие исходящего потока");
-        System.out.println("Закрытие чтения входящих");
-
-        clientSocket.close(); // закрытие сокета
-        System.out.println("Закрытие сокета");
-
-        setVisible(true);
+        receiveThread.start();
     }
 }
