@@ -35,12 +35,12 @@ public class l8ClientWindow extends JFrame {
 
         setVisible(true);
 
-        //Socket clientSocket = new Socket("127.0.0.1", 8189);
+        Socket clientSocket = new Socket("127.0.0.1", 8189);
 
         l8LoginDialog dialog = new l8LoginDialog(this);
         dialog.setVisible(true);
 
-        clientSocket = l8LoginDialog.clentSocket;
+        //clientSocket = l8LoginDialog.clentSocket;
 
         textArea.append("Вы подключились\n");
         System.out.println("Вы подключились");

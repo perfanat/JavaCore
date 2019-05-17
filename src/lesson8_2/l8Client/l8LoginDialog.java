@@ -80,7 +80,8 @@ public class l8LoginDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Socket clientSocket = new Socket("127.0.0.1", 8189);
+                    //Socket clientSocket = new Socket("127.0.0.1", 8189);
+                    Socket clientSocket = parent.clientSocket;
                     // создание исходящего потока
                     DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
                     // создание потока чтения
