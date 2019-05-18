@@ -35,68 +35,68 @@ public class l8ClientWindow extends JFrame {
 
         setVisible(true);
 
-        Socket clientSocket = new Socket("127.0.0.1", 8189);
-
-        l8LoginDialog dialog = new l8LoginDialog(this);
-        dialog.setVisible(true);
-
-        //clientSocket = l8LoginDialog.clentSocket;
+        this.clientSocket = new Socket("127.0.0.1", 8189);
 
         textArea.append("Вы подключились\n");
         System.out.println("Вы подключились");
 
-        // создание исходящего потока
-        DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
-        // создание потока чтения
-        DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
+        l8LoginDialog dialog = new l8LoginDialog(this);
+        dialog.setVisible(true);
 
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String text = textField.getText();
-                try {
-                    writer.writeUTF("Клиент: "+text);
-                    textField.setText("");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
-        textField.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String text = textField.getText();
-                try {
-                    writer.writeUTF("Клиент: "+text);
-                    textField.setText("");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
+        if (l8LoginDialog.isConnected) {
+            // создание исходящего потока
+            DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
+            // создание потока чтения
+            DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
 
-        String str = reader.readUTF();
-        textArea.append(str+"\n");
+            writer.writeUTF("Клиент: дайте мне информацию"); // написание сообщение
+            writer.flush(); // отправка
 
-        writer.writeUTF("Клиент: дайте мне информацию"); // написание сообщение
-        writer.flush(); // отправка
-
-        Thread receiveThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!Thread.currentThread().isInterrupted()){
-                    String str = null;
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String text = textField.getText();
                     try {
-                        str = reader.readUTF();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (!str.equals(null)){
-                        textArea.append(str+"\n");
+                        writer.writeUTF("Клиент: " + text);
+                        textField.setText("");
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
                 }
-            }
-        });
-        receiveThread.start();
+            });
+            textField.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String text = textField.getText();
+                    try {
+                        writer.writeUTF("Клиент: " + text);
+                        textField.setText("");
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            });
+
+            String str = reader.readUTF();
+            textArea.append(str + "\n");
+
+            Thread receiveThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        String str = null;
+                        try {
+                            str = reader.readUTF();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (!str.equals(null)) {
+                            textArea.append(str + "\n");
+                        }
+                    }
+                }
+            });
+            receiveThread.start();
+        }
     }
 }

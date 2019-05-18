@@ -16,13 +16,13 @@ import static lesson8_2.l8Client.l8MessagePatterns.*;
 
 public class l8LoginDialog extends JDialog {
 
-    public static Socket clentSocket;
     private JLabel lbUsername;
     private JComboBox jComboBox;
     private JTextField pfPassword;
     private JLabel lbPassword;
     private JButton btnLogin;
     private JButton btnCancel;
+    public static boolean isConnected = false;
 
     public l8LoginDialog (l8ClientWindow parent){
         super(parent, "Авторизация");
@@ -100,6 +100,7 @@ public class l8LoginDialog extends JDialog {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                isConnected=true;
                 dispose(); // закрываем окно
             }
         });

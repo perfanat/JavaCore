@@ -11,10 +11,13 @@ import java.util.Map;
 public class l8Server {
 
     private static Map<String, Socket> listOfSockets = Collections.synchronizedMap(new HashMap<>());
+    static int count = 0;
+    public static l8AuthService authService;
 
     public static void main(String[] args) throws IOException {
-        int count = 0;
+
         ServerSocket serverSocket = new ServerSocket(8189); // создание сервера
+        new l8AuthService();
         System.out.println("Сервер запущен...");
 
         while (true) {
@@ -25,8 +28,6 @@ public class l8Server {
             DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
             // создание исходящего потока
             DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
-
-            writer.writeUTF("Сервер: Вы клиент №"+count); // написание сообщение
 
             Thread receiveThread = new Thread(new Runnable() {
                 @Override
@@ -47,6 +48,8 @@ public class l8Server {
                                 try {
                                     writer.writeUTF("/auth successful");
                                     listOfSockets.put(user.getLogin(), clientSocket);
+                                    writer.writeUTF("Сервер: Вы клиент №"+count); // написание сообщение
+                                    System.out.println("отправка: Сервер: Вы клиент №"+count);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
