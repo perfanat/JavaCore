@@ -43,60 +43,67 @@ public class l8ClientWindow extends JFrame {
         l8LoginDialog dialog = new l8LoginDialog(this);
         dialog.setVisible(true);
 
+        // создание исходящего потока
+        DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
+        // создание потока чтения
+        DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
+
+        Thread receiveThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.currentThread().isInterrupted()) {
+                    String str = null;
+                    try {
+                        str = reader.readUTF();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    textArea.append(str + "\n");
+                    try {
+                        str = reader.readUTF();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (!str.equals(null)) {
+                        textArea.append(str + "\n");
+                        System.out.println("входящее сообщение");
+                    }
+                }
+            }
+        });
+        receiveThread.start();
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText();
+                try {
+                    writer.writeUTF("Клиент: " + text);
+                    textField.setText("");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        textField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = textField.getText();
+                try {
+                    writer.writeUTF("Клиент: " + text);
+                    textField.setText("");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+
         if (l8LoginDialog.isConnected) {
-            // создание исходящего потока
-            DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
-            // создание потока чтения
-            DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
 
             writer.writeUTF("Клиент: дайте мне информацию"); // написание сообщение
             writer.flush(); // отправка
 
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String text = textField.getText();
-                    try {
-                        writer.writeUTF("Клиент: " + text);
-                        textField.setText("");
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            });
-            textField.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String text = textField.getText();
-                    try {
-                        writer.writeUTF("Клиент: " + text);
-                        textField.setText("");
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            });
 
-            String str = reader.readUTF();
-            textArea.append(str + "\n");
-
-            Thread receiveThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!Thread.currentThread().isInterrupted()) {
-                        String str = null;
-                        try {
-                            str = reader.readUTF();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (!str.equals(null)) {
-                            textArea.append(str + "\n");
-                        }
-                    }
-                }
-            });
-            receiveThread.start();
         }
     }
 }

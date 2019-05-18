@@ -87,7 +87,12 @@ public class l8LoginDialog extends JDialog {
                     // создание потока чтения
                     DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
                     writer.writeUTF(String.format(AUTH_PATTERN, jComboBox.getSelectedItem(), pfPassword.getText()));
-                    String text = reader.readUTF();
+                    System.out.println("отправка: "+String.format(AUTH_PATTERN, jComboBox.getSelectedItem(), pfPassword.getText()));
+                    String text = null;
+                    while (text==null){
+                        text=reader.readUTF();
+                    }
+                    System.out.println("входящее сообщение: "+text);
                     if (text.equals(AUTH_SUCCESS_RESPONSE)){
                         dispose();
                     } else if (text.equals(AUTH_FAIL_RESPONSE)){

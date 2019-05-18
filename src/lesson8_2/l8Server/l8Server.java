@@ -60,6 +60,8 @@ public class l8Server {
                                     e.printStackTrace();
                                 }
                             }
+                        } else {
+                            System.out.println("отправить сообщение клиенту");
                         }
                     }
                 }
