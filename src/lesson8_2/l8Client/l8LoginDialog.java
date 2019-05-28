@@ -23,6 +23,8 @@ public class l8LoginDialog extends JDialog {
     private JButton btnLogin;
     private JButton btnCancel;
     public static boolean isConnected = false;
+//    public static DataOutputStream writer;
+//    public static DataInputStream reader;
 
     public l8LoginDialog (l8ClientWindow parent){
         super(parent, "Авторизация");
@@ -81,16 +83,16 @@ public class l8LoginDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     //Socket clientSocket = new Socket("127.0.0.1", 8189);
-                    Socket clientSocket = parent.clientSocket;
-                    // создание исходящего потока
-                    DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
-                    // создание потока чтения
-                    DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
-                    writer.writeUTF(String.format(AUTH_PATTERN, jComboBox.getSelectedItem(), pfPassword.getText()));
+//                    Socket clientSocket = parent.clientSocket;
+//                    // создание исходящего потока
+//                    writer = new DataOutputStream(clientSocket.getOutputStream());
+//                    // создание потока чтения
+//                    reader = new DataInputStream(clientSocket.getInputStream());
+                    parent.writer.writeUTF(String.format(AUTH_PATTERN, jComboBox.getSelectedItem(), pfPassword.getText()));
                     System.out.println("отправка: "+String.format(AUTH_PATTERN, jComboBox.getSelectedItem(), pfPassword.getText()));
                     String text = null;
                     while (text==null){
-                        text=reader.readUTF();
+                        text=parent.reader.readUTF();
                     }
                     System.out.println("входящее сообщение: "+text);
                     if (text.equals(AUTH_SUCCESS_RESPONSE)){

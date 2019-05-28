@@ -14,6 +14,8 @@ public class l8ClientWindow extends JFrame {
     public static JTextArea textArea;
     public JTextField textField;
     Socket clientSocket;
+    public static DataOutputStream writer;
+    public static DataInputStream reader;
 
     public l8ClientWindow() throws IOException {
         setTitle("Сетевой чат.");
@@ -40,25 +42,25 @@ public class l8ClientWindow extends JFrame {
         textArea.append("Вы подключились\n");
         System.out.println("Вы подключились");
 
-        l8LoginDialog dialog = new l8LoginDialog(this);
-        dialog.setVisible(true);
-
         // создание исходящего потока
         DataOutputStream writer = new DataOutputStream(clientSocket.getOutputStream());
         // создание потока чтения
         DataInputStream reader = new DataInputStream(clientSocket.getInputStream());
+
+        l8LoginDialog dialog = new l8LoginDialog(this);
+        dialog.setVisible(true);
 
         Thread receiveThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (!Thread.currentThread().isInterrupted()) {
                     String str = null;
-                    try {
-                        str = reader.readUTF();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    textArea.append(str + "\n");
+//                    try {
+//                        str = reader.readUTF();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    textArea.append(str + "\n");
                     try {
                         str = reader.readUTF();
                     } catch (IOException e) {
